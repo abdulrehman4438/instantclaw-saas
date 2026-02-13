@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
         if (!agent) return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
 
-        const orchestratorUrl = process.env.ORCHESTRATOR_URL || 'http://localhost:3001'
+        const orchestratorUrl = process.env.ORCHESTRATOR_URL || 'http://127.0.0.1:3001'
 
         // Destroy the container
         if (agent.container_id) {

@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         }
 
         // 5. Call the orchestrator to deploy the container
-        const orchestratorUrl = process.env.ORCHESTRATOR_URL || 'http://localhost:3001'
+        const orchestratorUrl = process.env.ORCHESTRATOR_URL || 'http://127.0.0.1:3001'
 
         const deployRes = await fetch(`${orchestratorUrl}/deploy`, {
             method: 'POST',
