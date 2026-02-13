@@ -40,6 +40,29 @@ export class DockerService {
         console.log(`[DockerService] Deploying ${containerName}...`);
 
         try {
+            // 0. Ensure image exists locally
+            const images = await docker.listImages();
+            const imageExists = images.some(img => img.RepoTags?.includes(image));
+
+            if (!imageExists) {
+                console.log(`[DockerService] Pulling image ${image}... (this may take a minute)`);
+                await new Promise((resolve, reject) => {
+                    docker.pull(image, (err: any, stream: any) => {
+                        if (err) return reject(err);
+                        docker.modem.followProgress(stream, onFinished, onProgress);
+
+                        function onFinished(err: any, output: any) {
+                            if (err) return reject(err);
+                            resolve(output);
+                        }
+                        function onProgress(event: any) {
+                            // Optional: log progress
+                        }
+                    });
+                });
+                console.log(`[DockerService] Image pulled successfully.`);
+            }
+
             // 1. Check if container already exists and remove it if so
             const existingContainer = docker.getContainer(containerName);
             try {
