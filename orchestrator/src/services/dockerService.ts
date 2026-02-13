@@ -129,20 +129,39 @@ export class DockerService {
             fs.writeFileSync(configPath, JSON.stringify(openclawConfig, null, 2));
 
             // NEW: Create auth-profiles.json for API keys
-            const authProfiles: Record<string, any> = {};
+            const authProfiles: Record<string, any> = {
+                version: 1,
+                profiles: {}
+            };
 
             // Map env keys to auth profiles
             if (env.GOOGLE_API_KEY) {
-                authProfiles.google = { apiKey: env.GOOGLE_API_KEY };
+                authProfiles.profiles["google:default"] = {
+                    type: "api_key",
+                    provider: "google",
+                    key: env.GOOGLE_API_KEY
+                };
             }
             if (env.OPENAI_API_KEY) {
-                authProfiles.openai = { apiKey: env.OPENAI_API_KEY };
+                authProfiles.profiles["openai:default"] = {
+                    type: "api_key",
+                    provider: "openai",
+                    key: env.OPENAI_API_KEY
+                };
             }
             if (env.ANTHROPIC_API_KEY) {
-                authProfiles.anthropic = { apiKey: env.ANTHROPIC_API_KEY };
+                authProfiles.profiles["anthropic:default"] = {
+                    type: "api_key",
+                    provider: "anthropic",
+                    key: env.ANTHROPIC_API_KEY
+                };
             }
             if (env.DEEPSEEK_API_KEY) {
-                authProfiles.deepseek = { apiKey: env.DEEPSEEK_API_KEY };
+                authProfiles.profiles["deepseek:default"] = {
+                    type: "api_key",
+                    provider: "deepseek",
+                    key: env.DEEPSEEK_API_KEY
+                };
             }
 
             const authPath = path.join(configDir, 'auth-profiles.json');
