@@ -6,7 +6,7 @@ import { DockerService } from './services/dockerService';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = parseInt(process.env.PORT || '3001', 10);
 const dockerService = new DockerService();
 
 app.use(cors());
