@@ -128,6 +128,26 @@ export class DockerService {
             const configPath = path.join(configDir, 'openclaw.json');
             fs.writeFileSync(configPath, JSON.stringify(openclawConfig, null, 2));
 
+            // NEW: Create auth-profiles.json for API keys
+            const authProfiles: Record<string, any> = {};
+
+            // Map env keys to auth profiles
+            if (env.GOOGLE_API_KEY) {
+                authProfiles.google = { apiKey: env.GOOGLE_API_KEY };
+            }
+            if (env.OPENAI_API_KEY) {
+                authProfiles.openai = { apiKey: env.OPENAI_API_KEY };
+            }
+            if (env.ANTHROPIC_API_KEY) {
+                authProfiles.anthropic = { apiKey: env.ANTHROPIC_API_KEY };
+            }
+            if (env.DEEPSEEK_API_KEY) {
+                authProfiles.deepseek = { apiKey: env.DEEPSEEK_API_KEY };
+            }
+
+            const authPath = path.join(configDir, 'auth-profiles.json');
+            fs.writeFileSync(authPath, JSON.stringify(authProfiles, null, 2));
+
             // Create a startup script that fixes permissions, installs config, and starts OpenClaw
             const startupScript = `#!/bin/bash
 set -e
@@ -141,6 +161,12 @@ su -s /bin/bash node -c "mkdir -p /home/node/.openclaw/workspace /home/node/.ope
 # Copy the pre-built config (overwrite if exists from previous deploy)  
 cp /tmp/openclaw-config/openclaw.json /home/node/.openclaw/openclaw.json
 chown node:node /home/node/.openclaw/openclaw.json
+
+# Copy auth profiles if present
+if [ -f /tmp/openclaw-config/auth-profiles.json ]; then
+    cp /tmp/openclaw-config/auth-profiles.json /home/node/.openclaw/auth-profiles.json
+    chown node:node /home/node/.openclaw/auth-profiles.json
+fi
 
 echo "[InstantClaw] Config installed:"
 cat /home/node/.openclaw/openclaw.json
