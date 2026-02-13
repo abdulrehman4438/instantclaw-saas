@@ -163,9 +163,17 @@ cp /tmp/openclaw-config/openclaw.json /home/node/.openclaw/openclaw.json
 chown node:node /home/node/.openclaw/openclaw.json
 
 # Copy auth profiles if present
+# Copy auth profiles if present
 if [ -f /tmp/openclaw-config/auth-profiles.json ]; then
+    # 1. Global auth profile
     cp /tmp/openclaw-config/auth-profiles.json /home/node/.openclaw/auth-profiles.json
     chown node:node /home/node/.openclaw/auth-profiles.json
+    
+    # 2. Agent-specific auth profile (where the error log says it's looking)
+    # We need to manually create this path because "doctor --fix" might not have run yet
+    su -s /bin/bash node -c "mkdir -p /home/node/.openclaw/agents/main/agent"
+    cp /tmp/openclaw-config/auth-profiles.json /home/node/.openclaw/agents/main/agent/auth-profiles.json
+    chown node:node /home/node/.openclaw/agents/main/agent/auth-profiles.json
 fi
 
 echo "[InstantClaw] Config installed:"
